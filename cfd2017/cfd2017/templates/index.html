@@ -1,0 +1,192 @@
+{% load static from staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link href="{% static "base/lib/bootstrap/css/bootstrap.min.css" %}" rel="stylesheet">
+<script src="{% static "base/lib/jquery/jquery.min.js" %} "></script>
+<script type="text/javascript" src="{% static "base/lib/angular.min.js" %}"></script>
+<script src="{% static "base/lib/bootstrap/js/bootstrap.min.js" %} "></script>
+</head>
+
+<script type="text/javascript">
+    var canvas, ctx, flag = false,
+        prevX = 0,
+        currX = 0,
+        prevY = 0,
+        currY = 0,
+        dot_flag = false;
+
+    var x = "black",
+        y = 2;
+    
+    function init() {
+        canvas = document.getElementById('can');
+        ctx = canvas.getContext("2d");
+        w = canvas.width;
+        h = canvas.height;
+    
+        canvas.addEventListener("mousemove", function (e) {
+            findxy('move', e)
+        }, false);
+        canvas.addEventListener("mousedown", function (e) {
+            findxy('down', e)
+        }, false);
+        canvas.addEventListener("mouseup", function (e) {
+            findxy('up', e)
+        }, false);
+        canvas.addEventListener("mouseout", function (e) {
+            findxy('out', e)
+        }, false);
+    }
+
+    function getMousePos(canvas, evt) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+          x: evt.clientX - rect.left,
+          y: evt.clientY - rect.top
+        };
+      }
+    
+    function draw() {
+        ctx.beginPath();
+        ctx.moveTo(prevX, prevY);
+        ctx.lineTo(currX, currY);
+        ctx.strokeStyle = x;
+        ctx.lineWidth = y;
+        ctx.stroke();
+        ctx.closePath();
+    }
+    
+    
+    function save() {
+        document.getElementById("canvasimg").style.border = "0px solid";
+        var dataURL = canvas.toDataURL();
+        document.getElementById("canvasimg").src = dataURL;
+        document.getElementById("canvasimg").style.display = "inline";
+        $('#myModal').modal('hide');
+    }
+    
+    function findxy(res, e) {
+        var mousePos = getMousePos(canvas, e);
+        console.log({'cx':currX, 'ax':mousePos.x,'cy':currY, 'ay':mousePos.y});
+        if (res == 'down') {
+            prevX = currX;
+            prevY = currY;
+            currX = e.clientX - canvas.offsetLeft -280;
+            currY = e.clientY - canvas.offsetTop -113;
+    
+            flag = true;
+            dot_flag = true;
+            if (dot_flag) {
+                ctx.beginPath();
+                ctx.fillStyle = x;
+                ctx.fillRect(currX, currY, 1, 1);
+                ctx.closePath();
+                dot_flag = false;
+            }
+        }
+        if (res == 'up' || res == "out") {
+            flag = false;
+        }
+        if (res == 'move') {
+            if (flag) {
+                prevX = currX;
+                prevY = currY;
+                currX = e.clientX - canvas.offsetLeft -280;
+                currY = e.clientY - canvas.offsetTop-113;
+                draw();
+            }
+        }
+    }
+
+    document.getElementById('download').addEventListener('click', function() {
+    downloadCanvas(this, 'canvas', 'test.png');
+    }, false);
+    </script>
+
+
+<body ng-app="cfd2017" ng-controller="similarity"  onload="init()">
+	<div class="container-fluid" style="text-align:center;">
+		<h2><strong>AIEra</strong></h2>
+		<h3>Signature Verification</h3>
+	</div>
+	<div class="container-fluid" style="padding-top: 20px;">
+		<h3>Base images: (Users True Signatures)</h3>
+		<div class="col-sm-3" style="margin:0; padding:0">
+			<img src="{% static "base/img/base.jpg" %}" class="img-thumbnail" alt="sign1">
+			<div class="container-fluid" style="text-align: center;"><input type="checkbox" ng-model="base"></div>
+		</div>
+		<div class="col-sm-3" style="margin:0; padding:0">
+			<img src="{% static "base/img/base1.jpg" %}" class="img-thumbnail" alt="sign1">
+			<div class="container-fluid" style="text-align: center;"><input type="checkbox" ng-model="base1"></div>
+		</div>
+		<div class="col-sm-3" style="margin:0; padding:0">
+			<img src="{% static "base/img/base3.jpg" %}" class="img-thumbnail" alt="sign1">
+			<div class="container-fluid" style="text-align: center;"><input type="checkbox" ng-model="base3"></div>
+		</div>
+	</div>
+	<div class="container-fluid">
+		<h3>Test images: (Users Test Signatures)</h3>
+		<div class="col-sm-3" style="margin:0; padding:0">
+			<img src="{% static "base/img/case1.jpg" %}" class="img-thumbnail" alt="sign1">
+			<div class="container-fluid" style="text-align: center;"><input type="checkbox" ng-model="case1"></div>
+		</div>
+		<div class="col-sm-3" style="margin:0; padding:0">
+			<img src="{% static "base/img/case2.jpg" %}" class="img-thumbnail" alt="sign1">
+			<div class="container-fluid" style="text-align: center;"><input type="checkbox" ng-model="case2"></div>
+		</div>
+		<div class="col-sm-3" style="margin:0; padding:0">
+			<img src="{% static "base/img/check1.jpg" %}" class="img-thumbnail" alt="sign1">
+			<div class="container-fluid" style="text-align: center;"><input type="checkbox" ng-model="check1"></div>
+		</div>
+		<div class="col-sm-3" style="margin:0; padding:0">
+			<img src="{% static "base/img/check2.jpg" %}" class="img-thumbnail" alt="sign1">
+			<div class="container-fluid" style="text-align: center;"><input type="checkbox" ng-model="check2"></div>
+		</div>
+		<div class="col-sm-3" style="margin:0; padding:0">
+			<img src="{% static "base/img/check.jpg" %}" class="img-thumbnail" alt="sign1">
+			<div class="container-fluid" style="text-align: center;"><input type="checkbox" ng-model="check"></div>
+		</div>
+		<div class="col-sm-3" style="margin:0; padding:0">
+			<img src="{% static "base/img/ck.jpg" %}" class="img-thumbnail" alt="sign1">
+			<div class="container-fluid" style="text-align: center;"><input type="checkbox" ng-model="ck"></div>
+		</div>
+		<div class="col-sm-3" style="margin:0; padding:0">
+			<img src="{% static "base/img/ck2.jpg" %}" class="img-thumbnail" alt="sign1">
+			<div class="container-fluid" style="text-align: center;"><input type="checkbox" ng-model="ck2"></div>
+		</div>
+	</div>
+	<br>
+	<div class="container-fluid">
+		<h3>Sign onscreen: <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Pad</button></h3>
+		<br>
+		<br>
+		<img id="canvasimg" style="display:none;">
+		<a id="download">Download as image</a>
+
+		<div class="modal fade" id="myModal" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Sign Please</h4>
+					</div>
+					<div class="modal-body">
+						<canvas id="can" width="750" height="200" style="position: relative; top:0; left:0"></canvas>
+						<br>
+						<input type="button" value="save" id="btn" size="30" onclick="save()" >
+						<input type="button" value="clear" id="clr" size="23" onclick="erase()" >
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<br>
+
+	<div class="container-fluid" style="text-align: center;">
+		<button class="btn btn-info" ng-click="simScore()">Check Similarity</button>{[{similarity}]}
+	</div>
+</body>
+<script src="{% static "base/js/custom.js" %} "></script>
+</html>
